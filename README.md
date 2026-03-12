@@ -1,4 +1,4 @@
-# d ⚠️ a 🎃 n 👻 g 🧛 e 🕯️ r 💀 c 🌙 l 🐈‍⬛ a 🦞 w
+<img src="dangerclaw.png">
 
 > *everything your AI should know before it helpfully makes things worse*
 
