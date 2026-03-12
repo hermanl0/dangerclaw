@@ -2,7 +2,6 @@ d ⚠️ a 🎃 n 👻 g 🧛 e 🕯️ r 💀 c 🌙 l 🐈‍⬛ a 🦞 w
 
 > *everything your AI should know before it helpfully makes things worse*
 
-
 ```
 >install
 
