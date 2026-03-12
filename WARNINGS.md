@@ -41,6 +41,23 @@
   │                                                          │
   └──────────────────────────────────────────────────────────┘
 ```
+───────────────────────────────────────────────────────────────
+
+## The Rewritten Consultant `Mar 2026`
+
+Security researcher Johann Rehberger used an autonomous AI agent to compromise McKinsey's internal chatbot "Lilli" via SQL injection. The vulnerability gave read and write access to the database — including Lilli's own system prompts. By silently rewriting them, the attacker could change how Lilli answered consultants, which safety rules it followed, and how it cited sources. Nobody noticed until Rehberger disclosed it.
+
+`src` [The Register](https://www.theregister.com/2026/03/09/mckinsey_ai_chatbot_hacked/)
+`→` An AI agent with database write access can have its own behaviour rewritten. Protecting the data is not enough — the system prompt is part of the attack surface too.
+
+───────────────────────────────────────────────────────────────
+
+## The Chaos Agents `Mar 2026`
+
+Researchers at Northeastern University gave autonomous AI agents access to email, filesystems, and a shell — then had 20 security researchers attack them for two weeks. The agents were manipulated into leaking private information, sharing documents they shouldn't have, and in one case deleting an entire email server. With very little effort.
+
+`src` [Northeastern University](https://news.northeastern.edu/2026/03/09/autonomous-ai-agents-of-chaos/)
+`→` Access to a communication channel is not the same as permission to use it freely. An agent without explicit pause-and-confirm logic is dangerous to give system access.
 
 ───────────────────────────────────────────────────────────────
 
