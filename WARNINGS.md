@@ -44,6 +44,15 @@
 
 ───────────────────────────────────────────────────────────────
 
+## The Fine Shorthand `Mar 2026`
+
+OpenClaw's exec allowlist validated command names but not abbreviated GNU flags. An attacker could pass `sort --danger` where `--dangerous-flag` was blocked — the validator saw `sort` (allowed) and missed the flag entirely. The result: arbitrary command execution without authentication, straight through the safelist.
+
+`src` [The Hacker Wire](https://www.thehackerwire.com/openclaw-sort-command-execution-bypass-cve-2026-32059/)
+`→` An allowlist that checks the command name but not its arguments is not an allowlist — it's a suggestion.
+
+───────────────────────────────────────────────────────────────
+
 ## The Public Diary `Feb 2026`
 
 OpenClaw's agent social network Moltbook was breached, exposing 1.5 million API tokens, 35,000 email addresses, and 4,000 private messages. The cause: Row Level Security was disabled in the database, and API keys were hardcoded in client-side JavaScript — visible to anyone who opened the browser dev tools. The private messages turned out not to be very private.
