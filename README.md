@@ -25,8 +25,6 @@ Stories can be anonymous or credited — your call. If credited, include only
 what the person has consented to share publicly.
 ```
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/image?repos=hermanl0/dangerclaw&type=Date&theme=dark" />
-  <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/image?repos=hermanl0/dangerclaw&type=Date" />
-  <img alt="Star History Chart" src="https://api.star-history.com/image?repos=hermanl0/dangerclaw&type=Date" />
-</picture>
+## Star History
+
+[![Star History Chart](https://api.star-history.com/image?repos=hermanl0/dangerclaw&type=date&legend=top-left)](https://www.star-history.com/?repos=hermanl0%2Fdangerclaw&type=date&legend=top-left)
