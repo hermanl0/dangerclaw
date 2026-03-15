@@ -246,4 +246,43 @@ n8n, a workflow automation platform widely used to orchestrate AI agents and con
 
 ───────────────────────────────────────────────────────────────
 
+
+───────────────────────────────────────────────────────────────
+
+## The Vibe-Coded Codebase `Mar 2026`
+
+DryRun Security tasked three production AI coding agents — Claude Code (Sonnet 4.6), OpenAI Codex (GPT 5.2), and Google Gemini (2.5 Pro) — with building two realistic applications from scratch: a family allergy tracker and a multiplayer browser game. No security guidance was added to any prompt. Researchers scanned every pull request as it was submitted. Twenty-six of thirty PRs contained at least one vulnerability — an 87% rate. The agents produced 143 security issues across 38 scans. Ten vulnerability classes appeared consistently across all three agents in both applications: broken access control, unauthenticated destructive endpoints, business logic failures where client-supplied scores and balances were accepted without server-side validation, OAuth CSRF from missing state parameters, WebSocket upgrade handlers that lacked authentication middleware despite the agents correctly wiring it into REST routes, rate limiting middleware defined but never attached, and JWT secrets hardcoded as fallback values. Claude Code introduced a 2FA-disable bypass not seen in the other agents' work. The pattern was not model-specific — it was structural. None of the agents were told to skip security. None of them asked whether they should add it.
+
+`src` [Help Net Security](https://www.helpnetsecurity.com/2026/03/13/claude-code-openai-codex-google-gemini-ai-coding-agent-security/) · [DryRun Security report](https://www.dryrun.security/)
+`→` AI coding agents default to "does it work" and not "is it safe." Broken access control — unauthenticated DELETE and POST endpoints — was the most universal finding, appearing in every agent's output across both applications. If you give a coding agent a spec with no security requirements, you will receive code with no security guarantees. Treat AI-generated PRs like contributions from a fast, confident junior developer who has never been taught to ask "who is allowed to do this?" Code review agents and SAST scanners must be mandatory in any pipeline where AI agents write production code.
+
+───────────────────────────────────────────────────────────────
+
+## The Workflow That Listened `Mar 2026`
+
+n8n, a workflow automation platform widely used to orchestrate AI agents and connect external services, was found to contain two critical vulnerabilities actively exploited in the wild. CVE-2026-27577 (CVSS 9.4) is a sandbox escape in n8n's expression compiler: a missing case in the AST rewriter allows the `process` object to pass through untransformed, giving any authenticated user with workflow edit permissions full remote code execution on the host. CVE-2026-27493 (CVSS 9.5) is more severe — a double-evaluation bug in n8n's Form nodes that exposes expression evaluation to unauthenticated users. A public "Contact Us" form is enough: submitting `{{$node["Start"].json["name"]}}` or a shell payload in the Name field executes code on the n8n server without any account. An earlier unauthenticated RCE, CVE-2026-21858 (CVSS 10.0), allowed full instance takeover via malformed webhook requests. CISA added the bugs to its Known Exploited Vulnerabilities catalog. At the time of disclosure, 24,700 internet-exposed n8n instances remained unpatched.
+
+`src` [The Hacker News](https://thehackernews.com/2026/03/critical-n8n-flaws-allow-remote-code.html) · [The Register](https://www.theregister.com/2026/03/12/cisa_n8n_rce/) · [Pillar Security](https://www.pillar.security/blog/zero-click-unauthenticated-rce-in-n8n-a-contact-form-that-executes-shell-commands)
+`→` Workflow automation platforms are AI agent infrastructure. When they evaluate user-supplied expressions server-side — even inside what appears to be a sandboxed context — every public-facing input field becomes a potential RCE vector. The AST rewriter that was supposed to neutralize `process` had a gap: one missing case, full shell access. Sandbox escapes at the compiler level cannot be mitigated by input validation — the fix must be in the evaluator. Until patched: disable Form nodes via `NODES_EXCLUDE=n8n-nodes-base.form`, restrict workflow edit permissions to fully trusted users, and assume any self-hosted n8n instance reachable from the internet may already be compromised.
+
+
+───────────────────────────────────────────────────────────────
+
+## The Invisible Instructor `Feb 2026`
+
+Security researcher Johann Rehberger (wunderwuzzi) demonstrated that AgentSkills — the markdown-based plugin format used by Claude Code, OpenAI Codex, Google Gemini CLI, and others — can be backdoored with hidden instructions that survive human code review entirely. The technique uses Unicode Tag codepoints (U+E0000–U+E007F), a block designed for language tagging in plain text that renders as invisible whitespace to humans but is faithfully parsed as meaningful tokens by models including Gemini, Claude, and Grok. A skill that looks clean in a diff or a GitHub PR contains a hidden layer of instructions only the AI will ever read. Rehberger demonstrated this against a real OpenAI skill, embedding instructions to exfiltrate data on invocation. The attack is a supply chain backdoor: a reviewer approves the skill, installs it, and from that point forward every invocation carries hidden instructions the user never consented to. The same vector applies to any skill or plugin that loads markdown from the filesystem, a package registry, or a marketplace.
+
+`src` [embracethered.com](https://embracethered.com/blog/posts/2026/scary-agent-skills/)
+`→` A human reviewing a skill file sees what Unicode renders. An AI executing it processes all codepoints, including the ones that are invisible. Skills, plugins, and any markdown loaded as agent instructions must be scanned for Unicode Tag codepoints (U+E0000–U+E007F) before installation — they have no legitimate use in skill files. A basic scanner (`grep -P "[\x{E0000}-\x{E007F}]"` or the `aid` tool at github.com/wunderwuzzi23/aid) catches them. Marketplace vetting that relies on human review alone will miss this class of attack every time.
+
+───────────────────────────────────────────────────────────────
+
+## The Kill Chain `Feb 2026`
+
+Researchers from Ben-Gurion University, Tel Aviv University, and Harvard Kennedy School published a paper arguing that prompt injection has matured into a distinct class of malware — which they term "promptware" — with a documented seven-stage kill chain: Initial Access (prompt injection), Privilege Escalation (jailbreaking), Reconnaissance, Persistence (memory and retrieval poisoning), Command and Control (C2 via external beacons embedded in injected content), Lateral Movement (spreading to other users or agents), and Actions on Objective (data theft, sabotage, fraud). The paper analysed 36 real-world attacks and documented studies against production LLM systems and found that at least 21 had already traversed four or more stages of this kill chain. Among the demonstrated attacks: a Google Calendar invitation used to achieve initial access, followed by delayed tool invocation to coerce a Gemini-powered assistant into Zoom surveillance and IoT manipulation across a five-stage chain — without any user interaction beyond accepting the invite. The paper was co-authored by Bruce Schneier and published in January 2026.
+
+`src` [Schneier on Security](https://www.schneier.com/blog/archives/2026/02/the-promptware-kill-chain.html) · [arXiv:2601.09625](https://arxiv.org/abs/2601.09625)
+`→` Treating every prompt injection as an isolated input-manipulation bug understates the actual threat. An agent with calendar access, memory, tool-calling, and network egress is not vulnerable to a single injection — it is potentially vulnerable to a seven-stage compromise that can persist across sessions, spread to other users, and exfiltrate data through channels that look like normal agent activity. Defense must address each stage: sandboxing content from instructions (Initial Access), no persistent memory writes from untrusted sources (Persistence), egress filtering (C2), and capability isolation between agents (Lateral Movement).
+
+
 *dangerclaw is a community-maintained collection — open a PR at github.com/hermanl0/dangerclaw*
