@@ -47,6 +47,15 @@
 ```
 ───────────────────────────────────────────────────────────────
 
+## The Hijacked Gateway `Mar 2026`
+
+Oasis Security discovered a vulnerability chain in OpenClaw's WebSocket gateway that allows any website to silently take full control of a developer's AI agent — with no plugins, browser extensions, or user interaction required beyond visiting the page. The gateway accepted WebSocket connections without validating the `Origin` header, violating the same-origin policy that browsers enforce for HTTP but do not automatically apply to WebSocket upgrades. A malicious page could initiate a WebSocket handshake to `ws://localhost:18789`, receive a valid session, and then dispatch commands to any connected node — running shell commands, reading files, modifying configuration, and accessing credentials stored in the gateway. The attack worked even on password-protected instances bound to loopback, because the browser itself initiates the connection with the victim's credentials already in scope. Hunt.io found over 17,500 internet-exposed instances vulnerable to the related CVE-2026-25253 (CVSS 8.8). The OpenClaw team shipped a fix within 24 hours of disclosure. Update to version 2026.2.25 or later.
+
+`src` [Oasis Security](https://www.oasis.security/blog/openclaw-vulnerability) · [AdminByRequest](https://www.adminbyrequest.com/en/blogs/openclaw-went-from-viral-ai-agent-to-security-crisis-in-just-three-weeks)
+`→` WebSocket servers do not inherit browser same-origin policy — they must enforce it themselves. A server that accepts `ws://` connections without checking the `Origin` header is reachable from any page the user visits, regardless of whether it binds to localhost. The fix is one line: reject WebSocket upgrade requests where `Origin` does not match an allowlist of trusted values. Any locally-running agent with a WebSocket interface — not just OpenClaw — is vulnerable to this class of attack if it skips origin validation.
+
+───────────────────────────────────────────────────────────────
+
 ## The Open Health Check `Mar 2026`
 
 The `mcp-memory-service` package — an open-source memory backend widely used in multi-agent systems — exposed a `/api/health/detailed` endpoint that returned a full reconnaissance blueprint of the host server: OS version, Python version, CPU core count, total memory, disk usage, and critically, the full filesystem path to the database file. The endpoint required no authentication. The conditions that made this possible were both common and documented: the service requires `MCP_ALLOW_ANONYMOUS_ACCESS=true` to operate without OAuth or an API key, which is the standard deployment configuration for most integrations, and it binds to `0.0.0.0` by default. Any scanner or attacker who could reach the port received the equivalent of a detailed server inventory in a single unauthenticated GET request. The database path alone is sufficient to direct further path traversal or direct database attacks. The vulnerability was assigned CVE-2026-29787 (CVSS 5.3) and patched in version 10.21.0.
