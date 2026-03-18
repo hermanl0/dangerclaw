@@ -11,18 +11,6 @@ or the start of your system prompt — and tell it to read the file before you b
 > contribute
 
 If you or someone you know has an AI cautionary tale worth adding, open a PR.
-
-Format:
-
-## The Title
-
-What happened, in 3–5 sentences. Keep it readable — you're telling a story,
-not filing an incident report. A little humor is welcome.
-
-**Lesson:** One sentence. What the AI should have done differently.
-
-Stories can be anonymous or credited — your call. If credited, include only
-what the person has consented to share publicly.
 ```
 
 ## Star History
