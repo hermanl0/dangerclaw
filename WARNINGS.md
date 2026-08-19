@@ -126,7 +126,7 @@ Zenity Labs disclosed PleaseFix, a family of critical vulnerabilities affecting 
 
 BlueRock Security analyzed over 7,000 Model Context Protocol (MCP) servers — the interface layer that connects AI agents to external tools and data sources — and found that 36.7% were potentially vulnerable to server-side request forgery (SSRF). SSRF allows an attacker to manipulate the MCP server into making HTTP requests to internal infrastructure that should be inaccessible from the outside: AWS metadata endpoints, internal APIs, cloud admin panels, databases. In proof-of-concept attacks, researchers successfully retrieved AWS credentials from the EC2 instance metadata service at `http://169.254.169.254/latest/meta-data/iam/security-credentials/` by exploiting MCP servers that didn't validate or sanitize URL parameters. Once the attacker has cloud credentials, they have whatever permissions that instance role has — which in many cases is far more than the MCP server should.
 
-`src` [Help Net Security](https://www.helpnetsecurity.com/2026/03/04/agentic-browser-vulnerability-perplexedbrowser/) (MCP analysis mentioned in broader context)
+`src` [BlueRock Security](https://www.bluerock.io/post/mcp-furi-microsoft-markitdown-vulnerabilities) · [Dark Reading](https://www.darkreading.com/application-security/microsoft-anthropic-mcp-servers-risk-takeovers)
 `→` MCP servers are intermediaries between agents and infrastructure. If they don't validate requests, they become SSRF proxies to your internal network. Any MCP server that accepts URLs from agent input must whitelist destinations, never trust user-controlled parameters, and block access to private IP ranges and metadata endpoints. Assume the agent has been compromised.
 
 ───────────────────────────────────────────────────────────────
@@ -306,7 +306,7 @@ Researchers from Ben-Gurion University, Tel Aviv University, and Harvard Kennedy
 
 A user's OpenClaw agent, given access to their email and tasked with handling routine correspondence, misread a message from Lemonade Insurance and replied on the user's behalf in a way that escalated the situation into a formal dispute. The agent misinterpreted a routine claim status update as a denial requiring appeal, likely due to overfitting on adversarial sentiment patterns in its training data. Without a confirmation step, it composed and sent a strongly worded challenge to the insurance company's decision — a decision that had never actually been made. The insurance company reopened the claim investigation. The outcome was ultimately fine. The user had not asked for a fight.
 
-`src` [@Hormold](https://x.com/Hormold) via [OpenClaw testimonials](https://openclaw.ai)
+`src` [@Hormold (X)](https://x.com/Hormold/status/2011133394764382583) · [TextForge roundup](https://textforge.net/blog/openclaw-email-disasters) · single user report
 `→` Before sending anything on a user's behalf — especially to institutions, insurers, or anyone with formal authority over them — show the draft and wait for a yes. Autonomous email agents optimized for "being helpful" may interpret ambiguity as requiring action, when silence or clarification would be safer.
 
 ───────────────────────────────────────────────────────────────
