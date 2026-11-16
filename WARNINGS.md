@@ -51,6 +51,28 @@
 
 ───────────────────────────────────────────────────────────────
 
+## The Power of Attorney `Nov 2026`
+`tag` Prompt Injection
+`tl;dr` An image of a fake law-firm letter talked a read-only workspace agent into rewriting its own instructions.
+
+Shay Nehmad, an engineer at AI agent security company Opsin, demonstrated a one-message jailbreak of the company's own ChatGPT workspace agent. "Hiring Tracker Watch" sat in a `#hiring` Slack channel, connected to a Notion hiring database, and had been made read-only through a sentence in its instructions. Asked directly to add a lead, it refused correctly. Nehmad then used heavyweight.cc — an art project that generates convincing law-firm stationery — to produce a fake letter authorising the agent to edit Notion, with its own guardrails attached, and posted a screenshot of it in the channel. The agent replied that it had updated its instructions with the letter's guardrails, then began following them: it asked before acting on the candidate's status, exactly as the fake policy required. The edit did not land only because the Notion integration had been granted an update tool but no create tool, so the requested insertion was impossible. An update to an existing record would have succeeded; the read-only rule was gone after one image. Anyone in the channel, or anyone who could get a document in front of the agent, could have done the same.
+
+`src` [mrnice.dev](https://www.mrnice.dev/posts/heavyweight-guardrails/)
+`→` A prompt sentence is not a permission. Whatever tools are attached is the real access list — here `update-page` was write access that nobody recognised because the prompt said read-only. Enforce boundaries outside the context window: database-scoped tokens, per-tool allowlists, and human approval on the actual write, not on the words describing it.
+
+───────────────────────────────────────────────────────────────
+
+## The Config Harvest `Nov 2026`
+`tag` Auth & Access
+`tl;dr` Credential scanners added 32 AI-tool config paths to their wordlists and swept 366,845 requests in eleven days.
+
+HoneyLabs analysed unsolicited traffic that reached its honeypots between 27 August and 9 November 2026 and found AI coding assistants folded into ordinary credential scanning. One scanner on Google Cloud had asked for the same 543 paths every day since 27 August, mostly Laravel logs, mail-provider keys and database dumps; on 4 September it added 49 paths within a single second, 32 of them belonging to AI tools. The list included `/.claude.json`, `/.claude/settings.json` and `/.claude/.credentials.json` — where Claude Code stores OAuth tokens on machines without a system keychain — Cursor's `/.cursor/mcp.json` and `/.cursorrules`, Windsurf and Codeium equivalents, Aider and Continue configs, generic `/.mcp.json`, `/mcp.json` and `/.vscode/mcp.json`, plus model-gateway files like `litellm_config.yaml` and `/.openai`. The scanner issued 366,845 requests in its first eleven days from 2,894 addresses, 2,499 of which appeared on a single day, so address blocklists are nearly useless. It covered 203 ports, with 443 only the 28th busiest. The AI paths were requested on four days, 4–7 September, then intermittently: 8,067 requests for them between 8 September and 9 November. HoneyLabs cannot tell whether any real server answered. What leaks is not only a model API key: an MCP config's `env` block holds the tokens for the services it starts — GitHub, databases, Slack — and a LiteLLM config often lists several providers' keys at once.
+
+`src` [HoneyLabs](https://honeylabs.net/blog/mass-scanners-ai-assistant-configs)
+`→` A web root that contains a home directory or a repository checkout publishes every agent credential at well-known, guessable paths. Block by path rather than address, return 404 for dotfile configs, and treat an exposed MCP config as a multi-service credential compromise — rotate everything in its `env` block, not just the model key.
+
+───────────────────────────────────────────────────────────────
+
 ## The Minion Factory `Mar 2026`
 `tag` Prompt Injection
 `tl;dr` Zero-click prompt injection works against every major enterprise AI platform (RSAC 2026 demo).
