@@ -51,6 +51,39 @@
 
 ───────────────────────────────────────────────────────────────
 
+## The Poisoned Framework `Nov 2026`
+`tag` Supply Chain
+`tl;dr` Malicious `agent-framework` PyPI releases ran a credential stealer on every Python start in AI agent environments.
+
+On November 17, 2026, attackers published malicious versions `1.26.1` and `1.26.2` of Microsoft's `agent-framework` PyPI package, a legitimate AI agent framework downloaded roughly 200,000 times per month. The packages added `.pth` startup hooks (`agent_framework_meta.pth` in `1.26.1`, `af_runtime_diag.pth` in `1.26.2`) that executed on every Python interpreter start without importing the package. The payload detached into the background, harvested environment variables and credential files from Azure CLI, npm, pip, Docker, Git, Hugging Face, and Azure DevOps; read secrets from other processes' `/proc/*/environ`; and, where available, requested Azure managed-identity and OIDC tokens, including GitHub Actions OIDC tokens in `1.26.2`. Collected data was zlib-compressed, base64-encoded, and exfiltrated via HTTPS POST to a hardcoded `webhook.site` endpoint. Wiz Research reported that the attacker appears to have used a compromised Microsoft ESRP client certificate and private key to publish through Microsoft's release pipeline; PyPI quarantined both versions by about 21:30 UTC.
+
+`src` [Wiz](https://www.wiz.io/blog/malicious-version-of-microsofts-agent-framework-published-to-pypi) · [GitHub Advisory GHSA-764m-3ppc-5m73](https://github.com/advisories/GHSA-764m-3ppc-5m73) · [Elastic Security Labs](https://www.elastic.co/security-labs/threat-command/we-caught-the-agent-framework-pypi-compromise-six-minutes-after-it-published)
+`→` Agent-framework dependencies are part of the agent's trust boundary: a malicious package can execute before any agent code runs and harvest the cloud, CI, and model credentials agents rely on. Pin AI framework dependencies, verify release provenance, and treat any host that installed a compromised agent package as credential-exposed.
+
+───────────────────────────────────────────────────────────────
+
+## The Autonomous Zero-Day `Nov 2026`
+`tag` Autonomy & Judgment
+`tl;dr` AI agents using Cairn autonomously found and exploited an unpatched zero-day to gain root on a university server.
+
+Amazon Threat Intelligence reported that a suspected China-nexus actor used Cairn, an open-source autonomous AI penetration-testing framework, to target universities in East Asia over a 48-hour period beginning September 8, 2026. After failing for nearly a day of autonomous attempts against other services — including Redis exploitation, Log4Shell, SSRF, and credential spraying — the agents mapped a MONAI Label medical imaging AI application, identified a vulnerable filename parameter in an upload endpoint, and confirmed a path traversal flaw. In about 11 minutes from API mapping to arbitrary file write, the agents exploited the zero-day; in a later session they wrote a Python reverse shell payload to `sitecustomize.py`, triggered a training endpoint to spawn a Python process, and obtained a root shell. Amazon assessed the MONAI Label flaw as a zero-day with high confidence and notified maintainers, who released a fix and advisory; the report also noted the actor later directed agents through a proxy into a second university network running the same vulnerable software.
+
+`src` [AWS Security Blog](https://aws.amazon.com/blogs/security/chinese-nexus-actors-cairn-ai-agents-found-a-zero-day-on-their-own/) · [The Register](https://www.theregister.com/security/2026/11/20/china-attackers-deployed-ai-agents-that-autonomously-found-and-exploited-a-0-day-to-take-over-a-university-server/5311382) · [GitHub Advisory GHSA-qc22-rmgc-vg94](https://github.com/Project-MONAI/MONAILabel/security/advisories/GHSA-qc22-rmgc-vg94)
+`→` Agentic offense compresses discovery-to-exploitation from days to minutes and keeps adapting without human direction. Internet-exposed AI applications need the same patch urgency and attack-surface minimization as any exposed service, because autonomous agents can systematically probe them faster than manual triage.
+
+───────────────────────────────────────────────────────────────
+
+## The Patch Diff Predator `Nov 2026`
+`tag` Autonomy & Judgment
+`tl;dr` An AI agent framework autonomously diffed security patches, built exploits, and executed them without human approval.
+
+Google Threat Intelligence Group reported in its Q4 2026 AI Threat Tracker that a suspected Russian-speaking operator deployed `exploit_agent`, a multi-agent vulnerability research and weaponization framework connected to frontier and local models. The framework was configured to continuously compare pre- and post-patch code for popular web application software, identify vulnerabilities fixed by the patches, generate exploit candidates, and automatically execute them with no human in the loop. Google found an exposed staging server containing the framework, stolen victim data, and post-compromise scripts for reconnaissance, brute forcing, webshell installation, and removal of competing attackers' webshells. Victim telemetry suggested interest in French media, entertainment, and education websites, and the framework had examined access controls in the Spectra WordPress plugin. Google described this as the first time it had observed LLM frameworks fully automating vulnerability discovery and exploitation without human involvement.
+
+`src` [Google Threat Intelligence Group](https://blog.google/innovation-and-ai/infrastructure-and-cloud/google-cloud/gtig-ai-threat-tracker-q4-2026/) · [The Register](https://www.theregister.com/research/2026/11/16/google-ai-agent-turned-a-security-patch-into-a-working-exploit-with-no-human-help/5309926)
+`→` The patch window is now an agentic attack window: public fixes can be turned into working exploits before defenders deploy them. Prioritize rapid patching for internet-facing software, monitor for post-patch exploitation patterns, and assume disclosed fixes are machine-readable attack instructions.
+
+───────────────────────────────────────────────────────────────
+
 ## The Minion Factory `Mar 2026`
 `tag` Prompt Injection
 `tl;dr` Zero-click prompt injection works against every major enterprise AI platform (RSAC 2026 demo).
